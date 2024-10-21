@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Rifa</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom right, #4A90E2, #003366);
+            margin: 0;
+            padding: 0;
+            color: #fff;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: rgba(250, 250, 250, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s;
+        }
+
+        .prize-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+
+        input[type="submit"] {
+            background-color: #2196F3;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0b7dda;
+            transform: scale(1.05);
+        }
+
+        .numbers {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .number-button {
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .number-button.selected {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .number-button.existing {
+            background-color: #dc3545; /* Vermelho para números já escolhidos */
+            color: white;
+        }
+
+        .total-price {
+            font-weight: bold;
+            font-size: 1.5em;
+            color: #fff;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        /* Estilo para a janela modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.8);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #007BFF; /* Azul */
+            color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: #fff;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #FFD700; /* Cor de destaque ao passar o mouse */
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .copy-button {
+            background-color: #FFD700; /* Cor do botão de copiar */
+            color: #333;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .copy-button:hover {
+            background-color: #FFC300; /* Cor ao passar o mouse */
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            input[type="text"],
+            input[type="email"],
+            input[type="tel"],
+            input[type="submit"],
+            .number-button,
+            .copy-button {
+                font-size: 14px;
+            }
+
+            .number-button {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Participe da Rifa!</h1>
+        <div class="prize-info">
+            <h2>Prêmio: Iphone 13 256gb!</h2>
+            <p>Preço do bilhete: R$ 5,00 por número</p>
+            <p>Sorteio: 30 de Novembro de 2024</p>
+            <p> após escolher o numero, role até embaixo para realizar o pagamento.</p>
+        </div>
+        <form id="rifa-form">
+            <label for="name">Seu Nome:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="email">Seu Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="phone">Seu Telefone:</label>
+            <input type="tel" id="phone" name="phone">
+
+            <label for="number">Escolha Números (1 a 1000):</label>
+            <div class="numbers" id="numbers-container"></div>
+
+            <div class="total-price" id="total-price">Total a pagar: R$ 0,00</div>
+            <input type="submit" value="Participar">
+        </form>
+    </div>
+
+    <!-- Janela Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h2>Pagamento</h2>
+            <p id="paymentMessage">Total a pagar: R$ 0,00</p>
+            <p>Chave PIX: <strong>lufmfagundes@gmail.com</strong></p>
+            <button class="copy-button" onclick="copyPix()">Copiar Chave PIX</button>
+        </div>
+    </div>
+
+    <script>
+        const selectedNumbers = new Set();
+        const pricePerNumber = 5;
+        const existingNumbers = new Set();
+
+        // Gera números aleatórios já escolhidos
+        function generateExistingNumbers(count) {
+            while (existingNumbers.size < count) {
+                const randomNumber = Math.floor(Math.random() * 1000) + 1;
+                existingNumbers.add(randomNumber);
+            }
+        }
+
+        function generateNumbers() {
+            const container = document.getElementById('numbers-container');
+            for (let i = 1; i <= 1000; i++) {
+                const button = document.createElement('button');
+                button.className = 'number-button';
+                button.innerText = i;
+
+                // Se o número estiver entre os já escolhidos, adiciona a classe "existing"
+                if (existingNumbers.has(i)) {
+                    button.classList.add('existing');
+                    button.style.backgroundColor = 'red'; // Vermelho para números já escolhidos
+                }
+
+                button.onclick = (event) => {
+                    event.preventDefault(); // Previne a ação padrão
+                    event.stopPropagation(); // Impede que o evento de clique se propague
+                    selectNumber(i);
+                };
+                container.appendChild(button);
+            }
+        }
+
+        function updateTotalPrice() {
+            const totalPrice = selectedNumbers.size * pricePerNumber;
+            document.getElementById('total-price').innerText = `Total a pagar: R$ ${totalPrice},00`;
+        }
+
+        function selectNumber(number) {
+            const button = document.querySelector(`.number-button:nth-child(${number})`);
+            if (existingNumbers.has(number)) {
+                alert('Esse número já foi escolhido.');
+                return;
+            }
+            if (selectedNumbers.has(number)) {
+                selectedNumbers.delete(number);
+                button.classList.remove('selected');
+                button.style.backgroundColor = '#007BFF'; // Reseta a cor
+            } else {
+                selectedNumbers.add(number);
+                button.classList.add('selected');
+                button.style.backgroundColor = '#28a745'; // Verde para números escolhidos
+            }
+            updateTotalPrice();
+        }
+
+        document.getElementById('rifa-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            if (selectedNumbers.size === 0) {
+                alert('Por favor, escolha ao menos um número.');
+                return;
+            }
+            const totalPrice = selectedNumbers.size * pricePerNumber;
+            document.getElementById('paymentMessage').innerText = `Total a pagar: R$ ${totalPrice},00`;
+            document.getElementById('paymentModal').style.display = "block";
+        });
+
+        // Função para copiar a chave PIX
+        function copyPix() {
+            const pixKey = "mectrefepods@gmail.com";
+            navigator.clipboard.writeText(pixKey).then(() => {
+                alert('Chave PIX copiada: ' + pixKey);
+            }).catch(err => {
+                alert('Erro ao copiar a chave PIX: ' + err);
+            });
+        }
+
+        // Fechar a janela modal
+        document.getElementById('closeModal').onclick = function() {
+            document.getElementById('paymentModal').style.display = "none";
+        }
+
+        // Fechar a janela ao clicar fora dela
+        window.onclick = function(event) {
+            if (event.target === document.getElementById('paymentModal')) {
+                document.getElementById('paymentModal').style.display = "none";
+            }
+        }
+
+        // Gerar números já escolhidos
+        generateExistingNumbers(250); // Define quantos números já foram escolhidos
+        // Exibir números
+        generateNumbers();
+    </script>
+</body>
+</html>
